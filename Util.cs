@@ -209,7 +209,7 @@ namespace BirthDaySign
 #if DEBUG
             if (string.IsNullOrWhiteSpace(str))
             {
-
+                
             }
 #endif
 

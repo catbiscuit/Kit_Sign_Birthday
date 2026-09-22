@@ -38,6 +38,9 @@ namespace BirthDaySign
             }
 
             DateTime dtNow = DateTime.Now;
+//#if DEBUG
+//            dtNow = DateTime.Parse("2026-09-08");
+//#endif
             DateTime dtDate = dtNow.Date;
             Lunar.Lunar nowChineseDate = Lunar.Lunar.FromDate(dtDate);
             int chineseYear = nowChineseDate.Year;
@@ -48,7 +51,7 @@ namespace BirthDaySign
             if (conf.Distance.HasValue && conf.Distance.Value >= 0)
                 distance = conf.Distance.Value;
 
-            Dictionary<int, List<string>> diffDay = [];
+            Dictionary<int, List<(string age_info, string remark)>> diffDay = [];
             List<CalendarInfo> calendarList = [];
             for (int i = 0; i <= distance; i++)
             {
@@ -124,7 +127,7 @@ namespace BirthDaySign
                                     age_info = $",现在{age}周岁";
                             }
 
-                            diffDay[calendar.Distance].Add($"({diffDay[calendar.Distance].Count + 1}){p.Name}{birth_info}{age_info}");
+                            diffDay[calendar.Distance].Add((age_info: $"({diffDay[calendar.Distance].Count + 1}){p.Name}{birth_info}{age_info}", remark: p.Remark));
                             Console.WriteLine("    =>success");
                         }
                         else
@@ -164,7 +167,7 @@ namespace BirthDaySign
                                     age_info = $",现在{age}周岁";
                             }
 
-                            diffDay[calendar.Distance].Add($"({diffDay[calendar.Distance].Count + 1}){p.Name}{birth_info}{age_info}");
+                            diffDay[calendar.Distance].Add((age_info: $"({diffDay[calendar.Distance].Count + 1}){p.Name}{birth_info}{age_info}", remark: p.Remark));
                             Console.WriteLine("    =>success");
                         }
                         else
@@ -196,7 +199,16 @@ namespace BirthDaySign
                         };
                         message_all.Add("");
                         message_all.Add(t);
-                        message_all.AddRange(item.Value);
+
+                        foreach (var (age_info, remark) in item.Value)
+                        {
+                            message_all.Add(age_info);
+
+                            if (string.IsNullOrWhiteSpace(remark) == false)
+                                message_all.Add($"备注:{remark}");
+                            
+                            message_all.Add("");
+                        }
                     }
                 }
                 if (diffError.Count > 0)
@@ -299,6 +311,10 @@ namespace BirthDaySign
         /// 姓名
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
         /// <summary>
         /// 农历生日，过农历生日才填。示例：1990.2.23，分隔符支持["/","-","."]。0.2.23或2.23，这种年份填0或不填也支持，只是年龄会为未知
         /// </summary>
